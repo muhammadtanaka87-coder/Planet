@@ -53,31 +53,20 @@ export class HeartText {
     }
 
     async loadFont(fontName = this.config.fontName) {
-        const loader = new FontLoader();
-        const fontMap = {
-            bevietnampro: 'assets/fonts/BeVietnamPro_Regular.json',
-            intertight: 'assets/fonts/InterTight_Regular.json',
-            meow_script: 'assets/fonts/MeowScript_Regular.json',
-            googlesanscode: 'assets/fonts/GoogleSansCode_Regular.json',
-            pacifico: 'assets/fonts/Pacifico_Regular.json',
-            updock: 'assets/fonts/Updock_Regular.json',
-            alumni_sans_pinstripe: 'assets/fonts/AlumniSansPinstripe_Regular.json',
-            dancing_script: 'assets/fonts/DancingScript_Regular.json',
-            cormorantunicase: 'assets/fonts/CormorantUnicase_Regular.json',
-        };
-        const fontUrl = fontMap[fontName];
-        if (!fontUrl) {
-            console.error(`Font "${fontName}" không tồn tại trong fontMap!`);
-            return;
-        }
-        try {
-            this.font = await new Promise((resolve, reject) => {
-                loader.load(fontUrl, resolve, undefined, reject);
-            });
-        } catch (error) {
-            console.error('Error loading font:', error);
-        }
+    const loader = new FontLoader();
+    
+    // Pakai font default dari Three.js CDN (nggak butuh file lokal)
+    const fontUrl = 'https://threejs.org/examples/fonts/helvetiker_bold.typeface.json';
+    
+    try {
+        this.font = await new Promise((resolve, reject) => {
+            loader.load(fontUrl, resolve, undefined, reject);
+        });
+        console.log('[HeartText] Font loaded from CDN ✅');
+    } catch (error) {
+        console.error('Error loading font:', error);
     }
+}
 
     renderText3D(newText) {
         
