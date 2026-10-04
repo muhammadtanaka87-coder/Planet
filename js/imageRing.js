@@ -365,23 +365,12 @@ export class FlowerRingSystem {
 
             // 2) Setelah sprite ada, preload banyak gambar lalu randomize material
             this.preloadTextures([
-                'assets/images/b1.png',
-                'assets/images/b2.png',
-                'assets/images/b3.png',
-                'assets/images/b4.png',
-                'assets/images/b5.png',
-                'assets/images/b6.png',
-                'assets/images/b7.png',
-                'assets/images/b8.png',
-                'assets/images/b9.png',
-                'assets/images/b10.png',
-                'assets/images/b11.png',
-                'assets/images/b12.png',
-                'assets/images/b13.png',
-                'assets/images/b14.png',
-                'assets/images/b15.png'
-                // tambahkan path lain di sini, pastikan file-nya ada
-            ]);
+    'assets/images/new1.gif',
+    'assets/images/letter.gif',
+    'assets/images/translator.gif',
+    'assets/images/vip.gif',
+    'assets/images/planet.png'
+]);
         },
         undefined,
         (error) => {
