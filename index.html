@@ -3,95 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Sphere</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; overflow: hidden; }
-        canvas { display: block; }
-        #debug {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgba(0,0,0,0.85);
-            color: #0f0;
-            font-family: monospace;
-            font-size: 12px;
-            padding: 10px;
-            border-radius: 6px;
-            z-index: 9999;
-            max-width: 400px;
-            white-space: pre-wrap;
-        }
-        .err { color: #f44; }
-        .ok { color: #0f0; }
-    </style>
-</head>
-<body>
-    <div id="debug">Debug:<br></div>
+    <title>Planet 3D</title>
+    <link rel="icon" type="image/png" href="assets/images/planet.png">
 
+    <!-- Three.js Import Map -->
     <script type="importmap">
     {
       "imports": {
-        "three": "https://unpkg.com/three@0.152.2/build/three.module.js"
+        "three": "https://unpkg.com/three@0.152.2/build/three.module.js",
+        "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.152.2/examples/jsm/controls/OrbitControls.js",
+        "three/addons/loaders/FontLoader.js": "https://unpkg.com/three@0.152.2/examples/jsm/loaders/FontLoader.js",
+        "three/addons/geometries/TextGeometry.js": "https://unpkg.com/three@0.152.2/examples/jsm/geometries/TextGeometry.js"
       }
     }
     </script>
 
-    <script type="module">
-        const dbg = document.getElementById('debug');
-        function log(msg, isErr) {
-            dbg.innerHTML += '<span class="' + (isErr ? 'err' : 'ok') + '">' + msg + '</span><br>';
-            console.log(msg);
+    <!-- GSAP untuk animasi kamera -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
+        /* Instruction overlay */
+        #instruction {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 13px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: opacity 0.5s ease;
+            text-align: center;
+            max-width: 90vw;
+        }
+        #instruction.hide {
+            opacity: 0;
+        }
+
+        /* Letter button */
+        #letterBtn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1.5px solid #ff6b6b;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        #letterBtn:hover {
+            background: rgba(255, 107, 107, 0.3);
+            transform: scale(1.1);
+        }
+        #letterBtn img {
+            width: 28px;
+            height: 28px;
+            pointer-events: none;
+        }
+
+        /* Gift button */
+        #giftBtn {
+            position: fixed;
+            top: 20px;
+            right: 80px;
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1.5px solid #ff6b6b;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        #giftBtn:hover {
+            background: rgba(255, 107, 107, 0.3);
+            transform: scale(1.1);
+        }
+        #giftBtn img {
+            width: 28px;
+            height: 28px;
+            pointer-events: none;
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 107, 107, 0.95);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-size: 13px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+            pointer-events: none;
+        }
+        #toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Instruction -->
+    <div id="instruction">
+        🖱️ Drag untuk rotate • Scroll untuk zoom • Klik 2x untuk efek
+    </div>
+
+    <!-- Letter button -->
+    <button id="letterBtn" title="Toggle Text 3D">
+        <img src="assets/images/letter.gif" alt="Letter">
+    </button>
+
+    <!-- Gift button -->
+    <button id="giftBtn" title="Toggle Flower Ring Flying">
+        <img src="assets/images/new1.gif" alt="Gift">
+    </button>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <script type="module">
         import * as THREE from 'three';
-        log('Three.js: v' + THREE.REVISION);
-
+        import { ParticleSystem } from './js/particles.js';
         import { CentralSphere } from './js/sphere.js';
-        log('sphere.js imported');
+        import { FlowerRingSystem } from './js/imageRing.js';
+        import { HeartText } from './js/heartText.js';
+        import { CameraController } from './js/camera.js';
 
+        // === SCENE SETUP ===
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setClearColor(0x000000);
         document.body.appendChild(renderer.domElement);
 
-        camera.position.set(0, 100, 500);
-        camera.lookAt(0, 0, 0);
+        // === LIGHTS ===
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-        const l1 = new THREE.PointLight(0xffffff, 1, 1000);
-        l1.position.set(200, 200, 200);
-        scene.add(l1);
+        const light1 = new THREE.PointLight(0xffffff, 1, 1000);
+        light1.position.set(200, 200, 200);
+        scene.add(light1);
 
-        let centralSphere;
-        try {
-            centralSphere = new CentralSphere(scene);
-            log('✅ CentralSphere OK');
-        } catch(e) {
-            log('❌ CentralSphere: ' + e.message, true);
+        const light2 = new THREE.PointLight(0xff88cc, 0.6, 1000);
+        light2.position.set(-200, -100, -200);
+        scene.add(light2);
+
+        // === INIT SYSTEMS ===
+        const particleSystem = new ParticleSystem(scene);
+        const centralSphere = new CentralSphere(scene);
+        centralSphere.setParticleSystem(particleSystem);
+
+        const flowerRingSystem = new FlowerRingSystem(scene);
+        centralSphere.setFlowerRing(flowerRingSystem);
+
+        const heartText = new HeartText(scene);
+        heartText.setText('Only For You');
+        heartText.setEffect('none');
+
+        const cameraController = new CameraController(camera, renderer);
+
+        // === TOAST ===
+        const toastEl = document.getElementById('toast');
+        let toastTimer = null;
+        function showToast(msg) {
+            toastEl.textContent = msg;
+            toastEl.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1800);
         }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            try {
-                if (centralSphere && centralSphere.animate) {
-                    centralSphere.animate();
-                }
-                renderer.render(scene, camera);
-            } catch(e) {
-                log('❌ Animate: ' + e.message, true);
+        // === DOUBLE CLICK ===
+        window.addEventListener('dblclick', () => {
+            cameraController.triggerAnimation();
+            document.getElementById('instruction').classList.add('hide');
+        });
+
+        // === MOBILE DOUBLE TAP ===
+        let lastTap = 0;
+        document.addEventListener('touchend', () => {
+            const now = Date.now();
+            if (now - lastTap < 350) {
+                cameraController.triggerAnimation();
+                document.getElementById('instruction').classList.add('hide');
             }
-        }
-        animate();
-        log('Animation started');
+            lastTap = now;
+        });
 
+        // === KEYBOARD SHORTCUT ===
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'ArrowUp') {
+                e.preventDefault();
+                if (flowerRingSystem) {
+                    if (!flowerRingSystem.isFlying) {
+                        flowerRingSystem.triggerFlyingEffect();
+                        showToast('🌸 Flower ring flying ON');
+                    } else {
+                        flowerRingSystem.toggleFlyingPause();
+                        showToast(flowerRingSystem.isPaused ? '⏸️ Flying paused' : '▶️ Flying resumed');
+                    }
+                }
+            }
+        });
+
+        // === LETTER BUTTON ===
+        document.getElementById('letterBtn').addEventListener('click', () => {
+            if (window.heartText) {
+                if (window.heartText.isHidden) {
+                    window.heartText.show();
+                    window.heartText.setText(window.heartText.config.text);
+                    showToast('💌 Text 3D shown');
+                } else {
+                    window.heartText.hide();
+                    showToast('💌 Text 3D hidden');
+                }
+            }
+        });
+
+        // === GIFT BUTTON ===
+        document.getElementById('giftBtn').addEventListener('click', () => {
+            if (flowerRingSystem) {
+                if (!flowerRingSystem.isFlying) {
+                    flowerRingSystem.triggerFlyingEffect();
+                    showToast('🌸 Flower ring flying ON');
+                } else {
+                    flowerRingSystem.toggleFlyingPause();
+                    showToast(flowerRingSystem.isPaused ? '⏸️ Flying paused' : '▶️ Flying resumed');
+                }
+            }
+        });
+
+        // === RESIZE ===
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            cameraController.handleResize();
         });
+
+        // === ANIMATION LOOP ===
+        function animate() {
+            requestAnimationFrame(animate);
+
+            particleSystem.animate();
+            centralSphere.animate();
+            flowerRingSystem.animate();
+            cameraController.update();
+            heartText.animate();
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // === EXPOSE TO WINDOW ===
+        window.heartText = heartText;
+        window.flowerRingSystem = flowerRingSystem;
+        window.centralSphere = centralSphere;
+        window.particleSystem = particleSystem;
+        window.cameraController = cameraController;
+
+        console.log('✅ Planet 3D loaded!');
     </script>
+
 </body>
 </html>
