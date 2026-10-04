@@ -3,14 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Particles</title>
+    <title>Test Sphere</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #000; overflow: hidden; }
         canvas { display: block; }
+        #debug {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.85);
+            color: #0f0;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            z-index: 9999;
+            max-width: 400px;
+            white-space: pre-wrap;
+        }
+        .err { color: #f44; }
+        .ok { color: #0f0; }
     </style>
 </head>
 <body>
+    <div id="debug">Debug:<br></div>
+
     <script type="importmap">
     {
       "imports": {
@@ -20,10 +38,17 @@
     </script>
 
     <script type="module">
-        import * as THREE from 'three';
-        import { ParticleSystem } from './js/particles.js';
+        const dbg = document.getElementById('debug');
+        function log(msg, isErr) {
+            dbg.innerHTML += '<span class="' + (isErr ? 'err' : 'ok') + '">' + msg + '</span><br>';
+            console.log(msg);
+        }
 
-        console.log('✅ Step 1: Three.js loaded');
+        import * as THREE from 'three';
+        log('Three.js: v' + THREE.REVISION);
+
+        import { CentralSphere } from './js/sphere.js';
+        log('sphere.js imported');
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
@@ -35,24 +60,32 @@
         camera.position.set(0, 100, 500);
         camera.lookAt(0, 0, 0);
 
-        console.log('✅ Step 2: Scene ready');
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const l1 = new THREE.PointLight(0xffffff, 1, 1000);
+        l1.position.set(200, 200, 200);
+        scene.add(l1);
 
+        let centralSphere;
         try {
-            const particleSystem = new ParticleSystem(scene);
-            console.log('✅ Step 3: ParticleSystem created');
+            centralSphere = new CentralSphere(scene);
+            log('✅ CentralSphere OK');
+        } catch(e) {
+            log('❌ CentralSphere: ' + e.message, true);
+        }
 
-            function animate() {
-                requestAnimationFrame(animate);
-                if (particleSystem && particleSystem.animate) {
-                    particleSystem.animate();
+        function animate() {
+            requestAnimationFrame(animate);
+            try {
+                if (centralSphere && centralSphere.animate) {
+                    centralSphere.animate();
                 }
                 renderer.render(scene, camera);
+            } catch(e) {
+                log('❌ Animate: ' + e.message, true);
             }
-            animate();
-            console.log('✅ Step 4: Animation started');
-        } catch (e) {
-            console.error('❌ ERROR in ParticleSystem:', e);
         }
+        animate();
+        log('Animation started');
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
