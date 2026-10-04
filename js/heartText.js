@@ -70,7 +70,7 @@ export class HeartText {
 
     renderText3D(newText) {
         
-        // Xóa toàn bộ mesh cũ
+        // Xóa toàn bộ mesh cũs
         if (this.textGroup) {
             while (this.textGroup.children.length > 0) {
                 const obj = this.textGroup.children[0];
