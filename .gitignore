@@ -1,1 +1,34 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
+# Backend uploads
+uploads/*
+!uploads/.gitkeep
+
+# Database files
+data/*.json
+!data/.gitkeep
+
+# Large files
+*.mp3
+*.mp4
+*.wav
+*.glb
+*.gltf
+*.fbx
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Env
+.env
+.env.local
