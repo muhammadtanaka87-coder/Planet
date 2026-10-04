@@ -359,7 +359,7 @@ export class FlowerRingSystem {
 
     // 1) Load 1 gambar dulu agar ring & sprite tercipta
     textureLoader.load(
-        'assets/images/b1.png',
+        'assets/images/new1.gif',
         (texture) => {
             this.processAndCreateFlowers(texture);
 
