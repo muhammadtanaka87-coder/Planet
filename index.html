@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Three.js</title>
+    <title>Test Particles</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #000; overflow: hidden; }
@@ -21,36 +21,44 @@
 
     <script type="module">
         import * as THREE from 'three';
+        import { ParticleSystem } from './js/particles.js';
 
-        console.log('Three.js version:', THREE.REVISION);
+        console.log('✅ Step 1: Three.js loaded');
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setClearColor(0x000000);
         document.body.appendChild(renderer.domElement);
 
-        camera.position.z = 5;
+        camera.position.set(0, 100, 500);
+        camera.lookAt(0, 0, 0);
 
-        // Cube merah
-        const geometry = new THREE.BoxGeometry(2, 2, 2);
-        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
+        console.log('✅ Step 2: Scene ready');
 
-        // Ambient light
-        scene.add(new THREE.AmbientLight(0xffffff, 1));
+        try {
+            const particleSystem = new ParticleSystem(scene);
+            console.log('✅ Step 3: ParticleSystem created');
 
-        function animate() {
-            requestAnimationFrame(animate);
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
-            renderer.render(scene, camera);
+            function animate() {
+                requestAnimationFrame(animate);
+                if (particleSystem && particleSystem.animate) {
+                    particleSystem.animate();
+                }
+                renderer.render(scene, camera);
+            }
+            animate();
+            console.log('✅ Step 4: Animation started');
+        } catch (e) {
+            console.error('❌ ERROR in ParticleSystem:', e);
         }
-        animate();
 
-        console.log('✅ Test Three.js loaded!');
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
