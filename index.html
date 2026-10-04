@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Galaxy 3D</title>
+    <title>Planet 3D</title>
     <link rel="icon" type="image/png" href="assets/images/planet.png">
 
     <!-- Three.js Import Map -->
@@ -128,7 +128,7 @@
             pointer-events: none;
         }
 
-        /* Gift button (toggle flower ring flying) */
+        /* Gift button */
         #giftBtn {
             position: fixed;
             top: 20px;
@@ -156,7 +156,7 @@
             pointer-events: none;
         }
 
-        /* Toast notification */
+        /* Toast */
         #toast {
             position: fixed;
             bottom: 40px;
@@ -184,7 +184,7 @@
     <!-- Loading Screen -->
     <div id="loading">
         <div class="spinner"></div>
-        <div class="title">Loading Galaxy</div>
+        <div class="title">Loading Planet</div>
         <div class="subtitle">Sabar yaa, planet nya lagi loading 🚀</div>
     </div>
 
@@ -208,7 +208,6 @@
 
     <script type="module">
         import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { ParticleSystem } from './js/particles.js';
         import { CentralSphere } from './js/sphere.js';
         import { FlowerRingSystem } from './js/imageRing.js';
@@ -250,7 +249,7 @@
 
         const cameraController = new CameraController(camera, renderer);
 
-        // === TOAST FUNCTION ===
+        // === TOAST ===
         const toastEl = document.getElementById('toast');
         let toastTimer = null;
         function showToast(msg) {
@@ -268,7 +267,7 @@
 
         // === MOBILE DOUBLE TAP ===
         let lastTap = 0;
-        document.addEventListener('touchend', (e) => {
+        document.addEventListener('touchend', () => {
             const now = Date.now();
             if (now - lastTap < 350) {
                 cameraController.triggerAnimation();
@@ -322,8 +321,6 @@
 
         // === RESIZE ===
         window.addEventListener('resize', () => {
-            camera.width = window.innerWidth;
-            camera.height = window.innerHeight;
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -344,10 +341,10 @@
         }
         animate();
 
-        // === HIDE LOADING AFTER 2s ===
+        // === HIDE LOADING AFTER 3s ===
         setTimeout(() => {
             document.getElementById('loading').classList.add('hide');
-        }, 2000);
+        }, 3000);
 
         // === EXPOSE TO WINDOW ===
         window.heartText = heartText;
@@ -356,7 +353,7 @@
         window.particleSystem = particleSystem;
         window.cameraController = cameraController;
 
-        console.log('✅ Galaxy 3D loaded successfully!');
+        console.log('✅ Planet 3D loaded!');
     </script>
 
 </body>
