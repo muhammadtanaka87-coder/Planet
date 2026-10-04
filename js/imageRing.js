@@ -367,8 +367,8 @@ export class FlowerRingSystem {
             this.preloadTextures([
     'assets/images/img2.jpeg',
     'assets/images/img3.jpeg',
-    'assets/images/translator.gif',
-    'assets/images/vip.gif',
+    'assets/images/img3.jpeg',
+    'assets/images/img3.jpeg',
     'assets/images/img1.jpeg'
 ]);
         },
