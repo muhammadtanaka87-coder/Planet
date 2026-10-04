@@ -34,50 +34,6 @@
             left: 0;
         }
 
-        /* Loading overlay */
-        #loading {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 9999;
-            color: #fff;
-            transition: opacity 0.8s ease;
-        }
-        #loading.hide {
-            opacity: 0;
-            pointer-events: none;
-        }
-        #loading .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            border-top: 4px solid #ff6b6b;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-            box-shadow: 0 0 30px rgba(255, 107, 107, 0.6);
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        #loading .title {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        #loading .subtitle {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 10px;
-        }
-
         /* Instruction overlay */
         #instruction {
             position: fixed;
@@ -181,24 +137,17 @@
 
 <body>
 
-    <!-- Loading Screen -->
-    <div id="loading">
-        <div class="spinner"></div>
-        <div class="title">Loading Planet</div>
-        <div class="subtitle">Sabar yaa, planet nya lagi loading 🚀</div>
-    </div>
-
     <!-- Instruction -->
     <div id="instruction">
         🖱️ Drag untuk rotate • Scroll untuk zoom • Klik 2x untuk efek
     </div>
 
-    <!-- Letter button (toggle text 3D) -->
+    <!-- Letter button -->
     <button id="letterBtn" title="Toggle Text 3D">
         <img src="assets/images/letter.gif" alt="Letter">
     </button>
 
-    <!-- Gift button (toggle flower ring flying) -->
+    <!-- Gift button -->
     <button id="giftBtn" title="Toggle Flower Ring Flying">
         <img src="assets/images/new1.gif" alt="Gift">
     </button>
@@ -340,11 +289,6 @@
             renderer.render(scene, camera);
         }
         animate();
-
-        // === HIDE LOADING AFTER 3s ===
-        setTimeout(() => {
-            document.getElementById('loading').classList.add('hide');
-        }, 3000);
 
         // === EXPOSE TO WINDOW ===
         window.heartText = heartText;
